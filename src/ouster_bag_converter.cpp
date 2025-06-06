@@ -82,6 +82,10 @@ int main(int argc, char** argv)
         {
           filtered_cloud->points.push_back(point);
         }
+        else
+        {
+          std::cout << "remove point , x : " << point.x << ", y : " << point.y << ", z : " << point.z << std::endl;
+        }
       }
 
       sensor_msgs::PointCloud2 output_msg;
