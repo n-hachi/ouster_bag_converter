@@ -5,6 +5,7 @@
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <ros/time.h>
 
 #include <pcl/point_cloud.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -55,6 +56,7 @@ int main(int argc, char** argv)
   int total = view.size();
   int cnt = 0;
   int last_progress = 0;
+  ros::Time pre_stamp(0, 0);
 
   // Convert
   for (const rosbag::MessageInstance& m : view)
@@ -83,6 +85,16 @@ int main(int argc, char** argv)
           filtered_cloud->points.push_back(point);
         }
       }
+
+      // If pre_stamp and latest stamp in header is the same, then do not output it.
+      ros::Time cur_stamp(msg->header.stamp);
+      if(pre_stamp == cur_stamp){
+        std::cout << std::endl << \
+          "stamp(" << cur_stamp.sec << "." << cur_stamp.nsec << ") is equvalent to latest timestamp" << std::endl;
+        continue;
+      }
+      // Update lates timestamp.
+      pre_stamp = cur_stamp;
 
       sensor_msgs::PointCloud2 output_msg;
       pcl::toROSMsg(*filtered_cloud, output_msg);
